@@ -41,6 +41,20 @@
             "port": 5858,
             "sourceMaps": false,
             "outDir": null
+        },
+        {
+            "name": "Debug unit tests",
+            // Type of configuration.
+            "type": "node",
+            "request": "attach",
+            "address": "localhost",
+            "localRoot": "${workspaceRoot}",
+            "port": 15429,
+            "preLaunchTask": "test.debug",
+            "windows": {
+                "preLaunchTask": "test.debug"            
+            }
+           
         }
     ]
 }

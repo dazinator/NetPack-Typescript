@@ -1,0 +1,17 @@
+{
+  "name": "netpack-typescript-compiler",
+  "description": "A typescript compiler that compiles files in memory.",
+  "author": "Darrell Tunnell",
+  "version": "0.0.1",
+  "main": "app.js",
+  "dependencies": {
+    "typescript": "^1.8.10"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "typings": "^1.3.2"
+  },
+  "scripts": {
+    "test.debug": "mocha --debug-brk=15429"
+  }
+}

@@ -1,5 +1,5 @@
-/// <reference path="../typings/globals/typescript/index.d.ts" />
-/// <reference path="../typings/globals/node/index.d.ts"/>
+/// <reference path="../typings/index.d.ts" />
+
 
 import * as ts from "typescript";
 import * as path from "path";
@@ -27,13 +27,21 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
         return clone;
     }
 
-    get sources(): ts.Map<string> {
+    sources = (): ts.Map<string> => {
         return this.shallowClone(this._sources);
     }
 
-    get outputs(): ts.Map<string> {
-        return this.shallowClone(this._outputs);
+     outputs = (): ts.Map<string> =>  {
+      return this.shallowClone(this._outputs);
     }
+
+    // get sources(): ts.Map<string> {
+    //     return this.shallowClone(this._sources);
+    // }
+
+    // get outputs(): ts.Map<string> {
+    //     return this.shallowClone(this._outputs);
+    // }
 
     // Implementing CompilerHost interface
     getSourceFile(filename: string, languageVersion: ts.ScriptTarget, onError?: (message: string) => void): ts.SourceFile {
@@ -74,11 +82,13 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
     }
 
     getCurrentDirectory(): string {
-        return "";
+        return  ""; //ts.sys.getCurrentDirectory();
     }
 
     getDefaultLibFileName(): string {
-        return path.join(__dirname, "lib", "lib.d.ts");
+        //var libes6File = path.normalize(__dir ts.getDefaultLibFilePath(this.options));
+        var libFile = path.normalize(ts.getDefaultLibFilePath(this.options));
+        return libFile;
     }
 
     getCanonicalFileName(fileName: string): string {
@@ -119,9 +129,9 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
 
     getSourcesFilenames(): string[] {
         var keys = [];
-
-        for (var k in this.sources)
-            if (this.sources.hasOwnProperty(k))
+        var sources = this.sources();
+        for (var k in sources)
+            if (sources.hasOwnProperty(k))
                 keys.push(k);
 
         return keys;
@@ -224,7 +234,7 @@ export default class NetPackTypescriptCompiler {
         }
 
         return {
-            sources: host.outputs,
+            sources: host.outputs(),
             errors: errors
         };
 
@@ -243,7 +253,7 @@ export default class NetPackTypescriptCompiler {
                 var loc = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
                 output += diagnostic.file.fileName + "(" + loc.line + "," + loc.character + "): ";
             }
-            var category = ts.DiagnosticCategory[diagnostic.category].toLowerCase();
+            var category = ts.DiagnosticCategory[diagnostic.category];
             output += category + " TS" + diagnostic.code + ": " + diagnostic.messageText + ts.sys.newLine;
             return output;
         }

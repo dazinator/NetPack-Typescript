@@ -1,10 +1,22 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
     "version": "0.1.0",
-    "command": "tsc",
+    "command": "cmd", 
     "isShellCommand": true,
-    "args": ["-p", "./src/tsconfig.json"],
-    "showOutput": "silent",
-    "problemMatcher": "$tsc"
+    "showOutput": "always",
+    "args": ["/C"],
+    "tasks": [
+        {
+        "taskName": "Build Type Script",
+        "suppressTaskName": true,
+        "isBuildCommand": true,
+        "args": ["tsc -p ./src/tsconfig.json"]
+        },
+        {
+        "taskName": "test.debug",
+        "suppressTaskName": true,
+        "isTestCommand": true,
+        "showOutput": "always",
+        "args": ["npm run-script"]    
+        }
+    ]
 }

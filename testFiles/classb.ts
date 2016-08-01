@@ -1,5 +1,5 @@
 ///<reference path="classa.ts" />
-import {ClassA} from "./classa";
+import {ClassA} from "../testFiles/classa";
 
 export class ClassB {
     constructor(public another: string) { }
