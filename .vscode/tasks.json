@@ -4,19 +4,20 @@
     "isShellCommand": true,
     "showOutput": "always",
     "args": ["/C"],
-    "tasks": [
+    "echoCommand": true,
+        "tasks": [
         {
         "taskName": "Build Type Script",
         "suppressTaskName": true,
         "isBuildCommand": true,
-        "args": ["tsc -p ./src/tsconfig.json"]
+        "args": ["tsc -p \"./src/tsconfig.json\""]
         },
         {
         "taskName": "test.debug",
         "suppressTaskName": true,
         "isTestCommand": true,
         "showOutput": "always",
-        "args": ["npm run-script"]    
+        "args": ["npm test"]    
         }
     ]
 }

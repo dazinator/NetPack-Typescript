@@ -43,18 +43,14 @@
             "outDir": null
         },
         {
+            
             "name": "Debug unit tests",
-            // Type of configuration.
             "type": "node",
             "request": "attach",
-            "address": "localhost",
             "localRoot": "${workspaceRoot}",
-            "port": 15429,
-            "preLaunchTask": "test.debug",
-            "windows": {
-                "preLaunchTask": "test.debug"            
-            }
-           
+            "port": 15429
+             // do a npm run-script test.debug before launching this config.
+             // "preLaunchTask": "test.debug"       
         }
     ]
 }
