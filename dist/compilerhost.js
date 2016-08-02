@@ -4,29 +4,48 @@ var ts = require("typescript");
 var path = require("path");
 var TypescriptCompilerHost = (function () {
     function TypescriptCompilerHost(options) {
-        var _this = this;
-        this._sources = {};
-        this._outputs = {};
+        this.sources = {};
+        this.outputs = {};
         this._setParentNode = true;
         this._fallbackToFiles = false;
-        this.shallowClone = function (obj) {
-            var clone = {};
-            for (var k in obj)
-                if (obj.hasOwnProperty(k)) {
-                    clone[k] = obj[k];
-                }
-            return clone;
-        };
-        this.sources = function () {
-            return _this.shallowClone(_this._sources);
-        };
-        this.outputs = function () {
-            return _this.shallowClone(_this._outputs);
-        };
         this.getNewLine = function () { return ts.sys.newLine; };
         this.options = options || {};
         // this.options.defaultLibFilename = this.options.defaultLibFilename || '';
     }
+    TypescriptCompilerHost.prototype.getStringFile = function (path) {
+        var filePath = path;
+        var caseSensitive = this.useCaseSensitiveFileNames();
+        var obj = this.sources;
+        for (var propName in obj) {
+            if (obj.hasOwnProperty(propName)) {
+                if (!caseSensitive) {
+                    if (propName.toLowerCase() == path.toLowerCase()) {
+                        return obj[propName];
+                    }
+                }
+                else {
+                    if (propName == path) {
+                        return obj[propName];
+                    }
+                }
+            }
+        }
+        return undefined;
+    };
+    // shallowClone = (obj: any): ts.Map<string> => {
+    //     var clone: ts.Map<string> = {};
+    //     for (var k in obj)
+    //         if (obj.hasOwnProperty(k)) {
+    //             clone[k] = obj[k];
+    //         }
+    //     return clone;
+    // }
+    // sources = (): ts.Map<string> => {
+    //     return this.shallowClone(this._sources);
+    // }
+    //  outputs = (): ts.Map<string> =>  {
+    //   return this.shallowClone(this._outputs);
+    // }
     // get sources(): ts.Map<string> {
     //     return this.shallowClone(this._sources);
     // }
@@ -35,27 +54,36 @@ var TypescriptCompilerHost = (function () {
     // }
     // Implementing CompilerHost interface
     TypescriptCompilerHost.prototype.getSourceFile = function (filename, languageVersion, onError) {
+        var file = this.getStringFile(filename);
+        if (file) {
+            return ts.createSourceFile(filename, file, languageVersion, true);
+        }
         if (path.normalize(filename) === this.getDefaultLibFileName())
             return this.readFromFile(filename, languageVersion, onError);
-        if (this._sources[filename])
-            return ts.createSourceFile(filename, this._sources[filename], languageVersion, true);
         if (this._fallbackToFiles)
             return this.readFromFile(filename, languageVersion, onError);
         return undefined;
     };
     TypescriptCompilerHost.prototype.readFile = function (fileName) {
-        if (this._sources[fileName])
-            return this._sources[fileName];
+        var file = this.getStringFile(fileName);
+        if (file) {
+            return file;
+        }
         if (path.normalize(fileName) === this.getDefaultLibFileName())
             return ts.sys.readFile(path.normalize(fileName));
         return "";
     };
     TypescriptCompilerHost.prototype.writeFile = function (filename, data, writeByteOrderMark, onError) {
-        this._outputs[filename] = data;
+        this.outputs[filename] = data;
     };
     ;
     TypescriptCompilerHost.prototype.fileExists = function (path) {
-        return this.sources.hasOwnProperty(path);
+        var file = this.getStringFile(path);
+        if (file) {
+            return true;
+        }
+        return false;
+        //  return this.sources.hasOwnProperty(path);
     };
     TypescriptCompilerHost.prototype.useCaseSensitiveFileNames = function () {
         return ts.sys.useCaseSensitiveFileNames;
@@ -92,11 +120,11 @@ var TypescriptCompilerHost = (function () {
             source = new StringSource(nameOrContents);
         else
             source = new StringSource(contents, nameOrContents);
-        this._sources[source.fileName] = source.contents;
+        this.sources[source.fileName] = source.contents;
     };
     TypescriptCompilerHost.prototype.getSourcesFilenames = function () {
         var keys = [];
-        var sources = this.sources();
+        var sources = this.sources;
         for (var k in sources)
             if (sources.hasOwnProperty(k))
                 keys.push(k);
@@ -175,7 +203,7 @@ var NetPackTypescriptCompiler = (function () {
             forwardErrors(errors, onError);
         }
         return {
-            sources: host.outputs(),
+            sources: host.outputs,
             errors: errors
         };
         function forwardErrors(errors, onError) {

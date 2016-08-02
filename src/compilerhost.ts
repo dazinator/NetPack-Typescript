@@ -7,8 +7,8 @@ import * as path from "path";
 
 export class TypescriptCompilerHost implements ts.CompilerHost {
 
-    private _sources: ts.Map<string> = {};
-    private _outputs: ts.Map<string> = {};
+    public sources: ts.Map<string> = {};
+    public outputs: ts.Map<string> = {};
     public options: ts.CompilerOptions;
     private _setParentNode: boolean = true;
     private _fallbackToFiles: boolean = false;
@@ -18,22 +18,46 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
         // this.options.defaultLibFilename = this.options.defaultLibFilename || '';
     }
 
-    shallowClone = (obj: any): ts.Map<string> => {
-        var clone: ts.Map<string> = {};
-        for (var k in obj)
-            if (obj.hasOwnProperty(k)) {
-                clone[k] = obj[k];
+    getStringFile(path: string): any {
+
+        var filePath = path;
+        var caseSensitive = this.useCaseSensitiveFileNames();
+        var obj = this.sources;
+        for (var propName in obj) {
+            if (obj.hasOwnProperty(propName)) {
+
+                if (!caseSensitive) {
+                    if (propName.toLowerCase() == path.toLowerCase()) {
+                        return obj[propName];
+                    }
+                }
+                else {
+                    if (propName == path) {
+                        return obj[propName];
+                    }
+                }
             }
-        return clone;
+        }
+
+        return undefined;
     }
 
-    sources = (): ts.Map<string> => {
-        return this.shallowClone(this._sources);
-    }
+    // shallowClone = (obj: any): ts.Map<string> => {
+    //     var clone: ts.Map<string> = {};
+    //     for (var k in obj)
+    //         if (obj.hasOwnProperty(k)) {
+    //             clone[k] = obj[k];
+    //         }
+    //     return clone;
+    // }
 
-     outputs = (): ts.Map<string> =>  {
-      return this.shallowClone(this._outputs);
-    }
+    // sources = (): ts.Map<string> => {
+    //     return this.shallowClone(this._sources);
+    // }
+
+    //  outputs = (): ts.Map<string> =>  {
+    //   return this.shallowClone(this._outputs);
+    // }
 
     // get sources(): ts.Map<string> {
     //     return this.shallowClone(this._sources);
@@ -45,11 +69,14 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
 
     // Implementing CompilerHost interface
     getSourceFile(filename: string, languageVersion: ts.ScriptTarget, onError?: (message: string) => void): ts.SourceFile {
+
+        var file = this.getStringFile(filename);
+        if (file) {
+            return ts.createSourceFile(filename, file, languageVersion, true);
+        }
+
         if (path.normalize(filename) === this.getDefaultLibFileName())
             return this.readFromFile(filename, languageVersion, onError);
-
-        if (this._sources[filename])
-            return ts.createSourceFile(filename, this._sources[filename], languageVersion, true);
 
         if (this._fallbackToFiles)
             return this.readFromFile(filename, languageVersion, onError);
@@ -58,8 +85,12 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
     }
 
     readFile(fileName: string): string {
-        if (this._sources[fileName])
-            return this._sources[fileName];
+
+        var file = this.getStringFile(fileName);
+
+        if (file) {
+            return file;
+        }
 
         if (path.normalize(fileName) === this.getDefaultLibFileName())
             return ts.sys.readFile(path.normalize(fileName));
@@ -68,11 +99,16 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
     }
 
     writeFile(filename: string, data: string, writeByteOrderMark: boolean, onError?: (message: string) => void) {
-        this._outputs[filename] = data;
+        this.outputs[filename] = data;
     };
 
     fileExists(path: string): boolean {
-        return this.sources.hasOwnProperty(path);
+        var file = this.getStringFile(path);
+        if (file) {
+            return true;
+        }
+        return false;
+        //  return this.sources.hasOwnProperty(path);
     }
 
     getNewLine = (): string => ts.sys.newLine;
@@ -82,7 +118,7 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
     }
 
     getCurrentDirectory(): string {
-        return  ""; //ts.sys.getCurrentDirectory();
+        return ""; //ts.sys.getCurrentDirectory();
     }
 
     getDefaultLibFileName(): string {
@@ -123,13 +159,13 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
         else
             source = new StringSource(contents, nameOrContents);
 
-        this._sources[source.fileName] = source.contents;
+        this.sources[source.fileName] = source.contents;
     }
 
 
     getSourcesFilenames(): string[] {
         var keys = [];
-        var sources = this.sources();
+        var sources = this.sources;
         for (var k in sources)
             if (sources.hasOwnProperty(k))
                 keys.push(k);
@@ -234,7 +270,7 @@ export default class NetPackTypescriptCompiler {
         }
 
         return {
-            sources: host.outputs(),
+            sources: host.outputs,
             errors: errors
         };
 
