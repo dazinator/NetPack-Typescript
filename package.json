@@ -2,7 +2,7 @@
   "name": "netpack-typescript-compiler",
   "description": "A typescript compiler that compiles files in memory.",
   "author": "Darrell Tunnell",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "dist/compilerhost.js",
   "dependencies": {
     "typescript": "^1.8.10"

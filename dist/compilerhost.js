@@ -185,20 +185,9 @@ var NetPackTypescriptCompiler = (function () {
         function forwardErrors(errors, onError) {
             if (typeof onError == 'function') {
                 errors.forEach(function (e) {
-                    e.formattedMessage = formatError(e);
                     onError(e);
                 });
             }
-        }
-        function formatError(diagnostic) {
-            var output = "";
-            if (diagnostic.file) {
-                var loc = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-                output += diagnostic.file.fileName + "(" + loc.line + "," + loc.character + "): ";
-            }
-            var category = ts.DiagnosticCategory[diagnostic.category];
-            output += category + " TS" + diagnostic.code + ": " + diagnostic.messageText + ts.sys.newLine;
-            return output;
         }
     };
     return NetPackTypescriptCompiler;
