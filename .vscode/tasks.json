@@ -11,13 +11,6 @@
         "suppressTaskName": true,
         "isBuildCommand": true,
         "args": ["tsc -p \"./src/tsconfig.json\""]
-        },
-        {
-        "taskName": "test.debug",
-        "suppressTaskName": true,
-        "isTestCommand": true,
-        "showOutput": "always",
-        "args": ["npm test"]    
         }
     ]
 }

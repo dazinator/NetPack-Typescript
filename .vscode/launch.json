@@ -22,35 +22,20 @@
             "outDir": null
         },
         {
-            "name": "Attach",
+            "name": "Run mocha",
             "type": "node",
-            "request": "attach",
-            "port": 5858,
-            "address": "localhost",
-            "restart": false,
-            "sourceMaps": false,
-            "outDir": null,
-            "localRoot": "${workspaceRoot}",
-            "remoteRoot": null
-        },
-        {
-            "name": "Attach to Process",
-            "type": "node",
-            "request": "attach",
-            "processId": "${command.PickProcess}",
-            "port": 5858,
-            "sourceMaps": false,
-            "outDir": null
-        },
-        {
-            
-            "name": "Debug unit tests",
-            "type": "node",
-            "request": "attach",
-            "localRoot": "${workspaceRoot}",
-            "port": 15429
-             // do a npm run-script test.debug before launching this config.
-             // "preLaunchTask": "test.debug"       
+            "request": "launch",
+            "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+            "stopOnEntry": false,
+            "args": [
+                "dist/test/**/*.js",
+                "--no-timeouts"
+            ],
+            "cwd": "${workspaceRoot}",
+            "runtimeExecutable": null,
+            "env": {
+                "NODE_ENV": "testing"
+            }
         }
     ]
 }
