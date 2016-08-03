@@ -1,9 +1,7 @@
 /// <reference path="../typings/index.d.ts" />
 
-
 import * as ts from "typescript";
 import * as path from "path";
-
 
 export class TypescriptCompilerHost implements ts.CompilerHost {
 
@@ -14,8 +12,7 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
     private _fallbackToFiles: boolean = false;
 
     constructor(options: ts.CompilerOptions) {
-        this.options = options || {};
-        // this.options.defaultLibFilename = this.options.defaultLibFilename || '';
+        this.options = options || {};      
     }
 
     getStringFile(path: string): any {
@@ -40,32 +37,7 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
         }
 
         return undefined;
-    }
-
-    // shallowClone = (obj: any): ts.Map<string> => {
-    //     var clone: ts.Map<string> = {};
-    //     for (var k in obj)
-    //         if (obj.hasOwnProperty(k)) {
-    //             clone[k] = obj[k];
-    //         }
-    //     return clone;
-    // }
-
-    // sources = (): ts.Map<string> => {
-    //     return this.shallowClone(this._sources);
-    // }
-
-    //  outputs = (): ts.Map<string> =>  {
-    //   return this.shallowClone(this._outputs);
-    // }
-
-    // get sources(): ts.Map<string> {
-    //     return this.shallowClone(this._sources);
-    // }
-
-    // get outputs(): ts.Map<string> {
-    //     return this.shallowClone(this._outputs);
-    // }
+    }    
 
     // Implementing CompilerHost interface
     getSourceFile(filename: string, languageVersion: ts.ScriptTarget, onError?: (message: string) => void): ts.SourceFile {
@@ -107,8 +79,7 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
         if (file) {
             return true;
         }
-        return false;
-        //  return this.sources.hasOwnProperty(path);
+        return false;       
     }
 
     getNewLine = (): string => ts.sys.newLine;
@@ -121,8 +92,7 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
         return ""; //ts.sys.getCurrentDirectory();
     }
 
-    getDefaultLibFileName(): string {
-        //var libes6File = path.normalize(__dir ts.getDefaultLibFilePath(this.options));
+    getDefaultLibFileName(): string {       
         var libFile = path.normalize(ts.getDefaultLibFilePath(this.options));
         return libFile;
     }
@@ -260,9 +230,7 @@ export default class NetPackTypescriptCompiler {
                 "Line": line + 1,
                 "Char": character + 1,
                 "Message": message
-            });
-
-            // console.log(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
+            });            
         });
 
         if (errors.length > 0) {

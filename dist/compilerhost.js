@@ -10,7 +10,6 @@ var TypescriptCompilerHost = (function () {
         this._fallbackToFiles = false;
         this.getNewLine = function () { return ts.sys.newLine; };
         this.options = options || {};
-        // this.options.defaultLibFilename = this.options.defaultLibFilename || '';
     }
     TypescriptCompilerHost.prototype.getStringFile = function (path) {
         var filePath = path;
@@ -32,26 +31,6 @@ var TypescriptCompilerHost = (function () {
         }
         return undefined;
     };
-    // shallowClone = (obj: any): ts.Map<string> => {
-    //     var clone: ts.Map<string> = {};
-    //     for (var k in obj)
-    //         if (obj.hasOwnProperty(k)) {
-    //             clone[k] = obj[k];
-    //         }
-    //     return clone;
-    // }
-    // sources = (): ts.Map<string> => {
-    //     return this.shallowClone(this._sources);
-    // }
-    //  outputs = (): ts.Map<string> =>  {
-    //   return this.shallowClone(this._outputs);
-    // }
-    // get sources(): ts.Map<string> {
-    //     return this.shallowClone(this._sources);
-    // }
-    // get outputs(): ts.Map<string> {
-    //     return this.shallowClone(this._outputs);
-    // }
     // Implementing CompilerHost interface
     TypescriptCompilerHost.prototype.getSourceFile = function (filename, languageVersion, onError) {
         var file = this.getStringFile(filename);
@@ -83,7 +62,6 @@ var TypescriptCompilerHost = (function () {
             return true;
         }
         return false;
-        //  return this.sources.hasOwnProperty(path);
     };
     TypescriptCompilerHost.prototype.useCaseSensitiveFileNames = function () {
         return ts.sys.useCaseSensitiveFileNames;
@@ -92,7 +70,6 @@ var TypescriptCompilerHost = (function () {
         return ""; //ts.sys.getCurrentDirectory();
     };
     TypescriptCompilerHost.prototype.getDefaultLibFileName = function () {
-        //var libes6File = path.normalize(__dir ts.getDefaultLibFilePath(this.options));
         var libFile = path.normalize(ts.getDefaultLibFilePath(this.options));
         return libFile;
     };
@@ -197,7 +174,6 @@ var NetPackTypescriptCompiler = (function () {
                 "Char": character + 1,
                 "Message": message
             });
-            // console.log(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
         });
         if (errors.length > 0) {
             forwardErrors(errors, onError);

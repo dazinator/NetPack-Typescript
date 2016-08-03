@@ -29,4 +29,4 @@ describe("NetPackTypescriptCompiler", function () {
         });
     });
 });
-//# sourceMappingURL=NetPackTypescriptCompiler.test.js.map
+//# sourceMappingURL=compiler.test.js.map
