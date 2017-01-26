@@ -172,7 +172,7 @@ export interface ICompilationResult {
 
 export default class NetPackTypescriptCompiler {
 
-    compileStrings(input, tscArgs?, options?: ts.CompilerOptions, onError?: (message) => void): ICompilationResult {
+    compileStrings(input, options?: ts.CompilerOptions, onError?: (message) => void): ICompilationResult {
 
         var host = new TypescriptCompilerHost(options);
 
@@ -197,26 +197,19 @@ export default class NetPackTypescriptCompiler {
         else
             throw new Error('Invalid value for input argument')
 
-        return this._compile(host, sources, tscArgs, options, onError);
+        return this._compile(host, sources, options, onError);
     }
 
-    _compile(host: TypescriptCompilerHost, sources: ISource[], tscArgs: string, options?: ts.CompilerOptions, onError?: (message) => void);
-    _compile(host: TypescriptCompilerHost, sources: ISource[], tscArgs: string[], options?: ts.CompilerOptions, onError?: (message) => void);
-    _compile(host: TypescriptCompilerHost, sources: ISource[], tscArgs?, options?: ts.CompilerOptions, onError?: (message) => void): ICompilationResult {
-
-        if (typeof tscArgs == "string")
-            tscArgs = tscArgs.split(' ');
-        else
-            tscArgs = tscArgs || [];
-
-        var commandLine = ts.parseCommandLine(tscArgs);
+    _compile(host: TypescriptCompilerHost, sources: ISource[], options?: ts.CompilerOptions, onError?: (message) => void);
+    _compile(host: TypescriptCompilerHost, sources: ISource[], options?: ts.CompilerOptions, onError?: (message) => void);
+    _compile(host: TypescriptCompilerHost, sources: ISource[], options?: ts.CompilerOptions, onError?: (message) => void): ICompilationResult {
+       
+       
         var files;
-
-
         sources.forEach(s => host.addSource(s.fileName, s.contents));
         files = host.getSourcesFilenames();
 
-        var program = ts.createProgram(files, commandLine.options, host);
+        var program = ts.createProgram(files, options, host);
 
         let emitResult = program.emit();
         let allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
