@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/34f6ecfb32443b43cb0c4194dbcf457d34eaffb4/memory-fs/index.d.ts",
+    "raw": "registry:dt/memory-fs#0.3.0+20161102145422",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/34f6ecfb32443b43cb0c4194dbcf457d34eaffb4/memory-fs/index.d.ts"
+  }
+}

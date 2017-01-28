@@ -216,14 +216,25 @@ export default class NetPackTypescriptCompiler {
 
         let errors = [];
         allDiagnostics.forEach(diagnostic => {
-            let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+            var errorResult = {};
+ 
+            if(diagnostic.file !== undefined)
+            {
+                let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                errorResult["File"] = diagnostic.file.fileName;
+                errorResult["Line"] = line + 1;
+                errorResult["Char"] = character + 1;                
+            }
+            else
+            {
+                errorResult["File"] = "";
+                errorResult["Line"] = 0;
+                errorResult["Char"] = 0;       
+            }
+           
             let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-            errors.push({
-                "File": diagnostic.file.fileName,
-                "Line": line + 1,
-                "Char": character + 1,
-                "Message": message
-            });            
+            errorResult["Message"] = message;
+            errors.push(errorResult);            
         });
 
         if (errors.length > 0) {
@@ -245,6 +256,7 @@ export default class NetPackTypescriptCompiler {
     }
 
 }
+
 
 
 

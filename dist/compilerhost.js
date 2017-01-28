@@ -129,7 +129,7 @@ exports.StringSource = StringSource;
 var NetPackTypescriptCompiler = (function () {
     function NetPackTypescriptCompiler() {
     }
-    NetPackTypescriptCompiler.prototype.compileStrings = function (input, tscArgs, options, onError) {
+    NetPackTypescriptCompiler.prototype.compileStrings = function (input, options, onError) {
         var host = new TypescriptCompilerHost(options);
         var sources = [];
         if (Array.isArray(input) && input.length) {
@@ -150,30 +150,32 @@ var NetPackTypescriptCompiler = (function () {
         }
         else
             throw new Error('Invalid value for input argument');
-        return this._compile(host, sources, tscArgs, options, onError);
+        return this._compile(host, sources, options, onError);
     };
-    NetPackTypescriptCompiler.prototype._compile = function (host, sources, tscArgs, options, onError) {
-        if (typeof tscArgs == "string")
-            tscArgs = tscArgs.split(' ');
-        else
-            tscArgs = tscArgs || [];
-        var commandLine = ts.parseCommandLine(tscArgs);
+    NetPackTypescriptCompiler.prototype._compile = function (host, sources, options, onError) {
         var files;
         sources.forEach(function (s) { return host.addSource(s.fileName, s.contents); });
         files = host.getSourcesFilenames();
-        var program = ts.createProgram(files, commandLine.options, host);
+        var program = ts.createProgram(files, options, host);
         var emitResult = program.emit();
         var allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
         var errors = [];
         allDiagnostics.forEach(function (diagnostic) {
-            var _a = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start), line = _a.line, character = _a.character;
+            var errorResult = {};
+            if (diagnostic.file !== undefined) {
+                var _a = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start), line = _a.line, character = _a.character;
+                errorResult["File"] = diagnostic.file.fileName;
+                errorResult["Line"] = line + 1;
+                errorResult["Char"] = character + 1;
+            }
+            else {
+                errorResult["File"] = "";
+                errorResult["Line"] = 0;
+                errorResult["Char"] = 0;
+            }
             var message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-            errors.push({
-                "File": diagnostic.file.fileName,
-                "Line": line + 1,
-                "Char": character + 1,
-                "Message": message
-            });
+            errorResult["Message"] = message;
+            errors.push(errorResult);
         });
         if (errors.length > 0) {
             forwardErrors(errors, onError);
