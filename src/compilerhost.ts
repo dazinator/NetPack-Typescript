@@ -5,11 +5,12 @@ import * as path from "path";
 
 export class TypescriptCompilerHost implements ts.CompilerHost {
 
-    public sources: ts.Map<string> = {};
-    public outputs: ts.Map<string> = {};
+    
+    public sources: any = {};
+    public outputs: any = {};
     public options: ts.CompilerOptions;
     private _setParentNode: boolean = true;
-    private _fallbackToFiles: boolean = false;
+    private _fallbackToFiles: boolean = true;
 
     constructor(options: ts.CompilerOptions) {
         this.options = options || {};      
@@ -81,6 +82,11 @@ export class TypescriptCompilerHost implements ts.CompilerHost {
         }
         return false;       
     }
+
+    getDirectories(path): string[] {
+        return ts.sys.getDirectories(path)
+    }   
+
 
     getNewLine = (): string => ts.sys.newLine;
 
@@ -241,7 +247,7 @@ export default class NetPackTypescriptCompiler {
             forwardErrors(errors, onError);
         }
 
-        return {
+        return {           
             sources: host.outputs,
             errors: errors
         };

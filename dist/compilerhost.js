@@ -1,17 +1,18 @@
-/// <reference path="../typings/index.d.ts" />
 "use strict";
-var ts = require("typescript");
-var path = require("path");
-var TypescriptCompilerHost = (function () {
-    function TypescriptCompilerHost(options) {
+/// <reference path="../typings/index.d.ts" />
+Object.defineProperty(exports, "__esModule", { value: true });
+const ts = require("typescript");
+const path = require("path");
+class TypescriptCompilerHost {
+    constructor(options) {
         this.sources = {};
         this.outputs = {};
         this._setParentNode = true;
-        this._fallbackToFiles = false;
-        this.getNewLine = function () { return ts.sys.newLine; };
+        this._fallbackToFiles = true;
+        this.getNewLine = () => ts.sys.newLine;
         this.options = options || {};
     }
-    TypescriptCompilerHost.prototype.getStringFile = function (path) {
+    getStringFile(path) {
         var filePath = path;
         var caseSensitive = this.useCaseSensitiveFileNames();
         var obj = this.sources;
@@ -30,9 +31,9 @@ var TypescriptCompilerHost = (function () {
             }
         }
         return undefined;
-    };
+    }
     // Implementing CompilerHost interface
-    TypescriptCompilerHost.prototype.getSourceFile = function (filename, languageVersion, onError) {
+    getSourceFile(filename, languageVersion, onError) {
         var file = this.getStringFile(filename);
         if (file) {
             return ts.createSourceFile(filename, file, languageVersion, true);
@@ -42,8 +43,8 @@ var TypescriptCompilerHost = (function () {
         if (this._fallbackToFiles)
             return this.readFromFile(filename, languageVersion, onError);
         return undefined;
-    };
-    TypescriptCompilerHost.prototype.readFile = function (fileName) {
+    }
+    readFile(fileName) {
         var file = this.getStringFile(fileName);
         if (file) {
             return file;
@@ -51,35 +52,38 @@ var TypescriptCompilerHost = (function () {
         if (path.normalize(fileName) === this.getDefaultLibFileName())
             return ts.sys.readFile(path.normalize(fileName));
         return "";
-    };
-    TypescriptCompilerHost.prototype.writeFile = function (filename, data, writeByteOrderMark, onError) {
+    }
+    writeFile(filename, data, writeByteOrderMark, onError) {
         this.outputs[filename] = data;
-    };
+    }
     ;
-    TypescriptCompilerHost.prototype.fileExists = function (path) {
+    fileExists(path) {
         var file = this.getStringFile(path);
         if (file) {
             return true;
         }
         return false;
-    };
-    TypescriptCompilerHost.prototype.useCaseSensitiveFileNames = function () {
+    }
+    getDirectories(path) {
+        return ts.sys.getDirectories(path);
+    }
+    useCaseSensitiveFileNames() {
         return ts.sys.useCaseSensitiveFileNames;
-    };
-    TypescriptCompilerHost.prototype.getCurrentDirectory = function () {
+    }
+    getCurrentDirectory() {
         return ""; //ts.sys.getCurrentDirectory();
-    };
-    TypescriptCompilerHost.prototype.getDefaultLibFileName = function () {
+    }
+    getDefaultLibFileName() {
         var libFile = path.normalize(ts.getDefaultLibFilePath(this.options));
         return libFile;
-    };
-    TypescriptCompilerHost.prototype.getCanonicalFileName = function (fileName) {
+    }
+    getCanonicalFileName(fileName) {
         // if underlying system can distinguish between two files whose names differs only in cases then file name already in canonical form.
         // otherwise use toLowerCase as a canonical form.
         return ts.sys.useCaseSensitiveFileNames ? fileName : fileName.toLowerCase();
-    };
+    }
     // Helper functions
-    TypescriptCompilerHost.prototype.readFromFile = function (filename, languageVersion, onError) {
+    readFromFile(filename, languageVersion, onError) {
         try {
             var text = ts.sys.readFile(path.normalize(filename));
         }
@@ -90,46 +94,41 @@ var TypescriptCompilerHost = (function () {
             text = "";
         }
         return text !== undefined ? ts.createSourceFile(filename, text, languageVersion, this._setParentNode) : undefined;
-    };
-    TypescriptCompilerHost.prototype.addSource = function (nameOrContents, contents) {
+    }
+    addSource(nameOrContents, contents) {
         var source;
         if (typeof contents == 'undefined')
             source = new StringSource(nameOrContents);
         else
             source = new StringSource(contents, nameOrContents);
         this.sources[source.fileName] = source.contents;
-    };
-    TypescriptCompilerHost.prototype.getSourcesFilenames = function () {
+    }
+    getSourcesFilenames() {
         var keys = [];
         var sources = this.sources;
         for (var k in sources)
             if (sources.hasOwnProperty(k))
                 keys.push(k);
         return keys;
-    };
-    return TypescriptCompilerHost;
-}());
+    }
+}
 exports.TypescriptCompilerHost = TypescriptCompilerHost;
-var StringSource = (function () {
-    function StringSource(contents, fileName) {
-        if (fileName === void 0) { fileName = StringSource._nextFilename(); }
+class StringSource {
+    constructor(contents, fileName = StringSource._nextFilename()) {
         this.contents = contents;
         this.fileName = fileName;
     }
-    StringSource._nextFilename = function () {
+    static _nextFilename() {
         return "input_string" + (++StringSource._counter) + '.ts';
-    };
-    StringSource.prototype.resetCounter = function () {
-        StringSource._counter = 0;
-    };
-    StringSource._counter = 0;
-    return StringSource;
-}());
-exports.StringSource = StringSource;
-var NetPackTypescriptCompiler = (function () {
-    function NetPackTypescriptCompiler() {
     }
-    NetPackTypescriptCompiler.prototype.compileStrings = function (input, options, onError) {
+    resetCounter() {
+        StringSource._counter = 0;
+    }
+}
+StringSource._counter = 0;
+exports.StringSource = StringSource;
+class NetPackTypescriptCompiler {
+    compileStrings(input, options, onError) {
         var host = new TypescriptCompilerHost(options);
         var sources = [];
         if (Array.isArray(input) && input.length) {
@@ -137,12 +136,14 @@ var NetPackTypescriptCompiler = (function () {
             if (typeof input[0] == 'string') {
                 sources.push(new StringSource(input[0])); // ts.map<string, StringSource>(input, );
             }
+            // Source[]
             else if (input[0] instanceof StringSource) {
                 sources.concat(input);
             }
             else
                 throw new Error('Invalid value for input argument');
         }
+        // dictionary
         else if (typeof input == 'object') {
             for (var k in input)
                 if (input.hasOwnProperty(k))
@@ -151,19 +152,19 @@ var NetPackTypescriptCompiler = (function () {
         else
             throw new Error('Invalid value for input argument');
         return this._compile(host, sources, options, onError);
-    };
-    NetPackTypescriptCompiler.prototype._compile = function (host, sources, options, onError) {
+    }
+    _compile(host, sources, options, onError) {
         var files;
-        sources.forEach(function (s) { return host.addSource(s.fileName, s.contents); });
+        sources.forEach(s => host.addSource(s.fileName, s.contents));
         files = host.getSourcesFilenames();
         var program = ts.createProgram(files, options, host);
-        var emitResult = program.emit();
-        var allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
-        var errors = [];
-        allDiagnostics.forEach(function (diagnostic) {
+        let emitResult = program.emit();
+        let allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
+        let errors = [];
+        allDiagnostics.forEach(diagnostic => {
             var errorResult = {};
             if (diagnostic.file !== undefined) {
-                var _a = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start), line = _a.line, character = _a.character;
+                let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
                 errorResult["File"] = diagnostic.file.fileName;
                 errorResult["Line"] = line + 1;
                 errorResult["Char"] = character + 1;
@@ -173,7 +174,7 @@ var NetPackTypescriptCompiler = (function () {
                 errorResult["Line"] = 0;
                 errorResult["Char"] = 0;
             }
-            var message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+            let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
             errorResult["Message"] = message;
             errors.push(errorResult);
         });
@@ -186,14 +187,12 @@ var NetPackTypescriptCompiler = (function () {
         };
         function forwardErrors(errors, onError) {
             if (typeof onError == 'function') {
-                errors.forEach(function (e) {
+                errors.forEach(e => {
                     onError(e);
                 });
             }
         }
-    };
-    return NetPackTypescriptCompiler;
-}());
-exports.__esModule = true;
-exports["default"] = NetPackTypescriptCompiler;
+    }
+}
+exports.default = NetPackTypescriptCompiler;
 //# sourceMappingURL=compilerhost.js.map

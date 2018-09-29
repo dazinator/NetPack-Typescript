@@ -1,5 +1,3 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import NetPackTypescriptCompiler from "../compilerhost";
 import * as fs from "fs";
 
@@ -40,7 +38,8 @@ describe("NetPackTypescriptCompiler", () => {
     "noImplicitAny": true,
     "sourceMap": true,
     "target": 1,
-     "outFile": "test.js"
+     "outFile": "test.js",  
+     
   };
          
           
