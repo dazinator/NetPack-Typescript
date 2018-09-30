@@ -5,7 +5,7 @@ environment:
 before_build:
 - ps: Install-Product node $env:nodejs_version
 - ps: npm install --loglevel=error
-- ps: "//registry.npmjs.org/:_authToken=$env:npm_authtoken`n" | out-file "$env:userprofile\.npmrc" -Encoding ASCII
+- ps: '"//registry.npmjs.org/:_authToken=$env:npm_authtoken`n" | out-file "$env:userprofile\.npmrc" -Encoding ASCII'
 
 after_deploy:
 - ps: npm publish
