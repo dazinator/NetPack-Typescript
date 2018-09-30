@@ -2,10 +2,11 @@ environment:
   nodejs_version: 6
   npm_authtoken:
     secure: ZFDpQDP37rVIg8if7QBpgVgCYhEtuaB6k/7Kd5VdZf5X9Eyi3wtdBZxnYLPpIVnH
-install:
+before_build:
 - ps: >-
     Install-Product node $env:nodejs_version
     npm install --loglevel=error
     "//registry.npmjs.org/:_authToken=$env:npm_authtoken`n" | out-file "$env:userprofile\.npmrc" -Encoding ASCII
+
 after_deploy:
 - ps: npm publish
