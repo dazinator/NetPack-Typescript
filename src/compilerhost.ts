@@ -1,5 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-
 import * as ts from "typescript";
 import * as path from "path";
 

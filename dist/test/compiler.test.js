@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const compilerhost_1 = require("../compilerhost");
-const fs = require("fs");
-const chai_1 = require("chai");
-describe("NetPackTypescriptCompiler", () => {
-    describe("compileStrings", () => {
-        it("successfully transpiles typescript to strings", () => {
+var compilerhost_1 = require("../compilerhost");
+var fs = require("fs");
+var mocha_1 = require("mocha");
+var chai_1 = require("chai");
+mocha_1.describe("NetPackTypescriptCompiler", function () {
+    mocha_1.describe("compileStrings", function () {
+        mocha_1.it("successfully transpiles typescript to strings", function () {
             // Arrange
             var classAFileContents = fs.readFileSync('testFiles/moduleA/classa.ts', "utf-8");
             var classBFileContents = fs.readFileSync('testFiles/moduleB/classb.ts', "utf-8");
@@ -20,8 +21,8 @@ describe("NetPackTypescriptCompiler", () => {
             var errorHandler = function (err) {
                 compileErrors.push(err);
             };
-            let sut = new compilerhost_1.default();
-            let options = {
+            var sut = new compilerhost_1.default();
+            var options = {
                 "inlineSourceMap": false,
                 "inlineSources": false,
                 "module": 2,
@@ -31,12 +32,12 @@ describe("NetPackTypescriptCompiler", () => {
                 "outFile": "test.js",
             };
             // Act
-            let result = sut.compileStrings(files, options, errorHandler);
+            var result = sut.compileStrings(files, options, errorHandler);
             // Assert
             chai_1.expect(result.errors.length).to.equal(0);
             chai_1.expect(result.sources["test.js"]).is.not.undefined;
         });
-        it("errors when invalid typescripts", () => {
+        mocha_1.it("errors when invalid typescripts", function () {
             // Arrange
             var classAFileContents = "this is .gibberish";
             //var args = '--module Amd -t es5 --outFile test.js --inlineSourceMap --traceResolution ';
@@ -48,8 +49,8 @@ describe("NetPackTypescriptCompiler", () => {
             var errorHandler = function (err) {
                 compileErrors.push(err);
             };
-            let sut = new compilerhost_1.default();
-            let options = {
+            var sut = new compilerhost_1.default();
+            var options = {
                 "inlineSourceMap": false,
                 "inlineSources": false,
                 "module": 1,
@@ -60,7 +61,7 @@ describe("NetPackTypescriptCompiler", () => {
             };
             //  var options = 
             // Act
-            let result = sut.compileStrings(files, options, errorHandler);
+            var result = sut.compileStrings(files, options, errorHandler);
             // Assert
             chai_1.expect(result.errors.length).not.equal(0);
         });

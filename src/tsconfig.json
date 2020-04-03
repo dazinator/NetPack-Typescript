@@ -2,10 +2,10 @@
     "compileOnSave": true,
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es6",
+        "target": "es5",
         "sourceMap": true,
         "outDir": "../dist",
-        "lib": ["es6"]
+        "lib": ["es5"]
     },
     "exclude": [
         "../node_modules/**/*",

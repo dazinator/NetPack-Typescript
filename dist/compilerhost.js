@@ -1,18 +1,17 @@
 "use strict";
-/// <reference path="../typings/index.d.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
-const ts = require("typescript");
-const path = require("path");
-class TypescriptCompilerHost {
-    constructor(options) {
+var ts = require("typescript");
+var path = require("path");
+var TypescriptCompilerHost = /** @class */ (function () {
+    function TypescriptCompilerHost(options) {
         this.sources = {};
         this.outputs = {};
         this._setParentNode = true;
         this._fallbackToFiles = true;
-        this.getNewLine = () => ts.sys.newLine;
+        this.getNewLine = function () { return ts.sys.newLine; };
         this.options = options || {};
     }
-    getStringFile(path) {
+    TypescriptCompilerHost.prototype.getStringFile = function (path) {
         var filePath = path;
         var caseSensitive = this.useCaseSensitiveFileNames();
         var obj = this.sources;
@@ -31,9 +30,9 @@ class TypescriptCompilerHost {
             }
         }
         return undefined;
-    }
+    };
     // Implementing CompilerHost interface
-    getSourceFile(filename, languageVersion, onError) {
+    TypescriptCompilerHost.prototype.getSourceFile = function (filename, languageVersion, onError) {
         var file = this.getStringFile(filename);
         if (file) {
             return ts.createSourceFile(filename, file, languageVersion, true);
@@ -43,8 +42,8 @@ class TypescriptCompilerHost {
         if (this._fallbackToFiles)
             return this.readFromFile(filename, languageVersion, onError);
         return undefined;
-    }
-    readFile(fileName) {
+    };
+    TypescriptCompilerHost.prototype.readFile = function (fileName) {
         var file = this.getStringFile(fileName);
         if (file) {
             return file;
@@ -52,38 +51,38 @@ class TypescriptCompilerHost {
         if (path.normalize(fileName) === this.getDefaultLibFileName())
             return ts.sys.readFile(path.normalize(fileName));
         return "";
-    }
-    writeFile(filename, data, writeByteOrderMark, onError) {
+    };
+    TypescriptCompilerHost.prototype.writeFile = function (filename, data, writeByteOrderMark, onError) {
         this.outputs[filename] = data;
-    }
+    };
     ;
-    fileExists(path) {
+    TypescriptCompilerHost.prototype.fileExists = function (path) {
         var file = this.getStringFile(path);
         if (file) {
             return true;
         }
         return false;
-    }
-    getDirectories(path) {
+    };
+    TypescriptCompilerHost.prototype.getDirectories = function (path) {
         return ts.sys.getDirectories(path);
-    }
-    useCaseSensitiveFileNames() {
+    };
+    TypescriptCompilerHost.prototype.useCaseSensitiveFileNames = function () {
         return ts.sys.useCaseSensitiveFileNames;
-    }
-    getCurrentDirectory() {
+    };
+    TypescriptCompilerHost.prototype.getCurrentDirectory = function () {
         return ""; //ts.sys.getCurrentDirectory();
-    }
-    getDefaultLibFileName() {
+    };
+    TypescriptCompilerHost.prototype.getDefaultLibFileName = function () {
         var libFile = path.normalize(ts.getDefaultLibFilePath(this.options));
         return libFile;
-    }
-    getCanonicalFileName(fileName) {
+    };
+    TypescriptCompilerHost.prototype.getCanonicalFileName = function (fileName) {
         // if underlying system can distinguish between two files whose names differs only in cases then file name already in canonical form.
         // otherwise use toLowerCase as a canonical form.
         return ts.sys.useCaseSensitiveFileNames ? fileName : fileName.toLowerCase();
-    }
+    };
     // Helper functions
-    readFromFile(filename, languageVersion, onError) {
+    TypescriptCompilerHost.prototype.readFromFile = function (filename, languageVersion, onError) {
         try {
             var text = ts.sys.readFile(path.normalize(filename));
         }
@@ -94,41 +93,46 @@ class TypescriptCompilerHost {
             text = "";
         }
         return text !== undefined ? ts.createSourceFile(filename, text, languageVersion, this._setParentNode) : undefined;
-    }
-    addSource(nameOrContents, contents) {
+    };
+    TypescriptCompilerHost.prototype.addSource = function (nameOrContents, contents) {
         var source;
         if (typeof contents == 'undefined')
             source = new StringSource(nameOrContents);
         else
             source = new StringSource(contents, nameOrContents);
         this.sources[source.fileName] = source.contents;
-    }
-    getSourcesFilenames() {
+    };
+    TypescriptCompilerHost.prototype.getSourcesFilenames = function () {
         var keys = [];
         var sources = this.sources;
         for (var k in sources)
             if (sources.hasOwnProperty(k))
                 keys.push(k);
         return keys;
-    }
-}
+    };
+    return TypescriptCompilerHost;
+}());
 exports.TypescriptCompilerHost = TypescriptCompilerHost;
-class StringSource {
-    constructor(contents, fileName = StringSource._nextFilename()) {
+var StringSource = /** @class */ (function () {
+    function StringSource(contents, fileName) {
+        if (fileName === void 0) { fileName = StringSource._nextFilename(); }
         this.contents = contents;
         this.fileName = fileName;
     }
-    static _nextFilename() {
+    StringSource._nextFilename = function () {
         return "input_string" + (++StringSource._counter) + '.ts';
-    }
-    resetCounter() {
+    };
+    StringSource.prototype.resetCounter = function () {
         StringSource._counter = 0;
-    }
-}
-StringSource._counter = 0;
+    };
+    StringSource._counter = 0;
+    return StringSource;
+}());
 exports.StringSource = StringSource;
-class NetPackTypescriptCompiler {
-    compileStrings(input, options, onError) {
+var NetPackTypescriptCompiler = /** @class */ (function () {
+    function NetPackTypescriptCompiler() {
+    }
+    NetPackTypescriptCompiler.prototype.compileStrings = function (input, options, onError) {
         var host = new TypescriptCompilerHost(options);
         var sources = [];
         if (Array.isArray(input) && input.length) {
@@ -152,19 +156,19 @@ class NetPackTypescriptCompiler {
         else
             throw new Error('Invalid value for input argument');
         return this._compile(host, sources, options, onError);
-    }
-    _compile(host, sources, options, onError) {
+    };
+    NetPackTypescriptCompiler.prototype._compile = function (host, sources, options, onError) {
         var files;
-        sources.forEach(s => host.addSource(s.fileName, s.contents));
+        sources.forEach(function (s) { return host.addSource(s.fileName, s.contents); });
         files = host.getSourcesFilenames();
         var program = ts.createProgram(files, options, host);
-        let emitResult = program.emit();
-        let allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
-        let errors = [];
-        allDiagnostics.forEach(diagnostic => {
+        var emitResult = program.emit();
+        var allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
+        var errors = [];
+        allDiagnostics.forEach(function (diagnostic) {
             var errorResult = {};
             if (diagnostic.file !== undefined) {
-                let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                var _a = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start), line = _a.line, character = _a.character;
                 errorResult["File"] = diagnostic.file.fileName;
                 errorResult["Line"] = line + 1;
                 errorResult["Char"] = character + 1;
@@ -174,7 +178,7 @@ class NetPackTypescriptCompiler {
                 errorResult["Line"] = 0;
                 errorResult["Char"] = 0;
             }
-            let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+            var message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
             errorResult["Message"] = message;
             errors.push(errorResult);
         });
@@ -187,12 +191,13 @@ class NetPackTypescriptCompiler {
         };
         function forwardErrors(errors, onError) {
             if (typeof onError == 'function') {
-                errors.forEach(e => {
+                errors.forEach(function (e) {
                     onError(e);
                 });
             }
         }
-    }
-}
+    };
+    return NetPackTypescriptCompiler;
+}());
 exports.default = NetPackTypescriptCompiler;
 //# sourceMappingURL=compilerhost.js.map

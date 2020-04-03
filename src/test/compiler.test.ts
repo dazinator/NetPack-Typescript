@@ -1,6 +1,7 @@
 import NetPackTypescriptCompiler from "../compilerhost";
 import * as fs from "fs";
 
+import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import * as ts from "typescript";
 
